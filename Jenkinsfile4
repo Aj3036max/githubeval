@@ -3,37 +3,21 @@ pipeline {
 
     stages {
 
-        stage('Clean old Docker') {
+        stage('Checkout SCM') {
             steps {
-                sh '''
-                sudo docker stop myapp || true
-                sudo docker rm myapp || true
-                sudo docker system prune -f
-                '''
+                build job: 'pipeline-jenkinsfile1-checkout-SCM'
+            }
+        }
+
+        stage('Install Docker') {
+            steps {
+                build job: 'pipeline-jenkinsfile2-install-docker'
             }
         }
 
         stage('Build Image') {
             steps {
-                sh 'sudo docker build -t myapp .'
-            }
-        }
-
-        stage('Run Container') {
-            steps {
-                sh 'sudo docker run -d -p 8080:80 --name myapp myapp'
-            }
-        }
-
-        stage('Copy Website') {
-            steps {
-                sh 'sudo docker cp monsite/. myapp:/usr/share/nginx/html/'
-            }
-        }
-
-        stage('Check Container') {
-            steps {
-                sh 'sudo docker ps'
+                build job: 'pipeline-jenkinsfile3-build-nginx'
             }
         }
     }
