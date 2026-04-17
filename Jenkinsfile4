@@ -5,19 +5,19 @@ pipeline {
 
         stage('Checkout SCM') {
             steps {
-                build job: 'pipeline-jenkinsfile1-checkout-SCM'
+                build job: 'pipeline-jenkinsfile1-checkout-SCM', wait: true, propagate: false
             }
         }
 
         stage('Install Docker') {
             steps {
-                build job: 'pipeline-jenkinsfile2-install-docker'
+                build job: 'pipeline-jenkinsfile2-install-docker', wait: true, propagate: false
             }
         }
 
         stage('Build Image') {
             steps {
-                build job: 'pipeline-jenkinsfile3-build-nginx'
+                build job: 'pipeline-jenkinsfile3-build-nginx', wait: true, propagate: false
             }
         }
     }
