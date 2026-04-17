@@ -2,20 +2,28 @@ pipeline {
     agent any
 
     stages {
-        stage('Install Docker') {
+
+        stage('Clean Workspace') {
             steps {
-                sh '''
-                sudo apt update
-                sudo apt install -y docker.io
-                sudo systemctl start docker
-                sudo systemctl enable docker
-                '''
+                deleteDir()
             }
         }
 
-        stage('Check Docker') {
+        stage('Checkout SCM') {
             steps {
-                sh 'docker --version'
+                git branch: 'main', url: 'https://github.com/Aj3036max/githubeval.git'
+            }
+        }
+
+        stage('Pull Nginx Image') {
+            steps {
+                sh 'sudo docker pull nginx'
+            }
+        }
+
+        stage('Check Image') {
+            steps {
+                sh 'sudo docker images'
             }
         }
     }
