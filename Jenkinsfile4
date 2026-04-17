@@ -3,41 +3,37 @@ pipeline {
 
     stages {
 
-        stage('Checkout SCM') {
+        stage('Clean old Docker') {
             steps {
-                git branch: 'main', url: 'https://github.com/Aj3036max/githubeval.git'
+                sh '''
+                sudo docker stop myapp || true
+                sudo docker rm myapp || true
+                sudo docker system prune -f
+                '''
             }
         }
 
-        stage('Run Jenkinsfile1') {
+        stage('Build Image') {
             steps {
-                script {
-                    load 'Jenkinsfile1'
-                }
+                sh 'sudo docker build -t myapp .'
             }
         }
 
-        stage('Run Jenkinsfile2') {
+        stage('Run Container') {
             steps {
-                script {
-                    load 'Jenkinsfile2'
-                }
+                sh 'sudo docker run -d -p 8080:80 --name myapp myapp'
             }
         }
 
-        stage('Run Jenkinsfile3') {
+        stage('Copy Website') {
             steps {
-                script {
-                    load 'Jenkinsfile3'
-                }
+                sh 'sudo docker cp monsite/. myapp:/usr/share/nginx/html/'
             }
         }
 
-        stage('Run Jenkinsfile4') {
+        stage('Check Container') {
             steps {
-                script {
-                    load 'Jenkinsfile4'
-                }
+                sh 'sudo docker ps'
             }
         }
     }
