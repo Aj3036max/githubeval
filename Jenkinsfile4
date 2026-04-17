@@ -1,0 +1,54 @@
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Clean Workspace') {
+            steps {
+                deleteDir()
+            }
+        }
+
+        stage('Checkout SCM') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Aj3036max/githubeval.git'
+            }
+        }
+
+        stage('Install Docker') {
+            steps {
+                sh '''
+                sudo apt update
+                sudo apt install -y docker.io
+                sudo systemctl start docker
+                sudo systemctl enable docker
+                '''
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'sudo docker build -t mynginx .'
+            }
+        }
+
+        stage('Stop old container') {
+            steps {
+                sh 'sudo docker stop mynginx-container || true'
+                sh 'sudo docker rm mynginx-container || true'
+            }
+        }
+
+        stage('Run Container') {
+            steps {
+                sh 'sudo docker run -d -p 8080:80 --name mynginx-container mynginx'
+            }
+        }
+
+        stage('Check Container') {
+            steps {
+                sh 'sudo docker ps'
+            }
+        }
+    }
+}
