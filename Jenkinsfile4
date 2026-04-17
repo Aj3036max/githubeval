@@ -20,5 +20,40 @@ pipeline {
                 build job: 'pipeline-jenkinsfile3-build-nginx', wait: true, propagate: false
             }
         }
+
+        // 🔥 Étape 4 ajoutée ici
+        stage('Clean Docker') {
+            steps {
+                sh '''
+                sudo docker stop myapp || true
+                sudo docker rm myapp || true
+                sudo docker image prune -f
+                '''
+            }
+        }
+
+        stage('Build myapp Image') {
+            steps {
+                sh 'sudo docker build -t myapp .'
+            }
+        }
+
+        stage('Run Container') {
+            steps {
+                sh 'sudo docker run -d -p 8080:80 --name myapp myapp'
+            }
+        }
+
+        stage('Copy monsite') {
+            steps {
+                sh 'sudo docker cp monsite/. myapp:/usr/share/nginx/html/'
+            }
+        }
+
+        stage('Check Container') {
+            steps {
+                sh 'sudo docker ps'
+            }
+        }
     }
 }
